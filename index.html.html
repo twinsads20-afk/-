@@ -1,0 +1,634 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>حاسبة أسعار الطباعة ثلاثية الأبعاد</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Font Awesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Tajawal Font -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;800&display=swap" rel="stylesheet">
+    
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Tajawal', 'sans-serif'],
+                    },
+                    colors: {
+                        brand: {
+                            50: '#f0f7ff',
+                            100: '#e0effe',
+                            500: '#0284c7',
+                            600: '#0369a1',
+                            700: '#035485',
+                            900: '#0f172a',
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body {
+            font-family: 'Tajawal', sans-serif;
+            background-color: #f8fafc;
+        }
+        input[type="number"]::-webkit-inner-spin-button,
+        input[type="number"]::-webkit-outer-spin-button {
+            -webkit-appearance: none;
+            margin: 0;
+        }
+        input[type="number"] {
+            -moz-appearance: textfield;
+        }
+        ::-webkit-scrollbar {
+            width: 6px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #f1f5f9;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #cbd5e1;
+            border-radius: 4px;
+        }
+    </style>
+</head>
+<body class="text-slate-800 min-h-screen flex flex-col justify-between selection:bg-brand-500 selection:text-white">
+
+    <header class="bg-slate-900 text-white border-b border-slate-800 shadow-sm sticky top-0 z-50">
+        <div class="max-w-6xl mx-auto px-4 py-4 flex items-center justify-between">
+            <div class="flex items-center space-x-3 space-x-reverse">
+                <div class="w-10 h-10 rounded-xl bg-brand-500 flex items-center justify-center text-white shadow-lg shadow-brand-500/30">
+                    <i class="fa-solid fa-cube text-xl"></i>
+                </div>
+                <div>
+                    <h1 class="text-xl font-bold leading-tight">حاسبة تسعير الطباعة 3D</h1>
+                    <p class="text-xs text-slate-400">حساب دقيق بالدرهم الإماراتي (AED)</p>
+                </div>
+            </div>
+            <button onclick="resetCalculator()" class="text-xs bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-white py-2 px-3.5 rounded-xl transition-all flex items-center gap-2 border border-slate-700 active:scale-95">
+                <i class="fa-solid fa-rotate-right"></i>
+                <span>تفريغ الحقول</span>
+            </button>
+        </div>
+    </header>
+
+    <main class="max-w-6xl mx-auto px-4 py-6 w-full flex-grow">
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+
+            <!-- Primary Inputs Column (7 cols) -->
+            <div class="lg:col-span-7 space-y-6">
+
+                <!-- Print Specifications -->
+                <div class="bg-white rounded-2xl p-5 md:p-6 shadow-sm border border-slate-100">
+                    <h2 class="text-lg font-bold text-slate-900 mb-4 flex items-center gap-2 border-b border-slate-100 pb-3">
+                        <i class="fa-solid fa-sliders text-brand-500"></i>
+                        بيانات الطباعة الأساسية
+                    </h2>
+
+                    <div class="space-y-4">
+                        <!-- Weight Input -->
+                        <div>
+                            <label for="weight" class="block text-sm font-semibold text-slate-700 mb-1.5">
+                                وزن القطعة (بالجرام) <span class="text-rose-500">*</span>
+                            </label>
+                            <div class="relative rounded-xl shadow-sm">
+                                <input type="number" id="weight" min="0" step="any" placeholder="أدخل الوزن بالجرام..." value="" oninput="calculatePrice()"
+                                    class="w-full pl-16 pr-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-brand-500 focus:border-brand-500 outline-none transition text-slate-900 font-bold text-lg placeholder:font-normal placeholder:text-sm">
+                                <div class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-400 font-medium text-sm">
+                                    جرام (g)
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Printing Time Input -->
+                        <div>
+                            <label class="block text-sm font-semibold text-slate-700 mb-1.5">
+                                وقت الطباعة المستغرق <span class="text-rose-500">*</span>
+                            </label>
+                            <div class="grid grid-cols-2 gap-3">
+                                <div class="relative rounded-xl shadow-sm">
+                                    <input type="number" id="hours" min="0" step="any" placeholder="الساعات..." value="" oninput="calculatePrice()"
+                                        class="w-full pl-14 pr-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-brand-500 focus:border-brand-500 outline-none transition text-slate-900 font-bold text-lg placeholder:font-normal placeholder:text-sm">
+                                    <div class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-400 font-medium text-sm">
+                                        ساعة
+                                    </div>
+                                </div>
+                                <div class="relative rounded-xl shadow-sm">
+                                    <input type="number" id="minutes" min="0" max="59" step="any" placeholder="الدقائق..." value="" oninput="calculatePrice()"
+                                        class="w-full pl-14 pr-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-brand-500 focus:border-brand-500 outline-none transition text-slate-900 font-bold text-lg placeholder:font-normal placeholder:text-sm">
+                                    <div class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-400 font-medium text-sm">
+                                        دقيقة
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Material Type Selection -->
+                        <div>
+                            <label for="materialType" class="block text-sm font-semibold text-slate-700 mb-1.5">
+                                نوع المادة / سعر البكرة
+                            </label>
+                            <select id="materialType" onchange="handleMaterialChange()"
+                                class="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-brand-500 focus:border-brand-500 outline-none transition text-slate-800 font-medium">
+                                <option value="80">PLA عادي (80 درهم / 1000g)</option>
+                                <option value="120">PLA احترافي / Silk / Matte (120 درهم / 1000g)</option>
+                                <option value="100">PETG / ABS (100 درهم / 1000g)</option>
+                                <option value="180">TPU مرن (180 درهم / 1000g)</option>
+                                <option value="custom">سعر مخصص للبكرة...</option>
+                            </select>
+                        </div>
+
+                        <!-- Custom Spool Price (Hidden unless selected) -->
+                        <div id="customSpoolContainer" class="hidden">
+                            <label for="spoolPrice" class="block text-xs font-semibold text-slate-600 mb-1">
+                                اكتب سعر البكرة (1000 جرام)
+                            </label>
+                            <div class="relative">
+                                <input type="number" id="spoolPrice" min="0" placeholder="80" value="80" oninput="calculatePrice()"
+                                    class="w-full pl-12 pr-3 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm font-semibold focus:ring-2 focus:ring-brand-500 outline-none">
+                                <span class="absolute inset-y-0 left-0 pl-3 flex items-center text-xs text-slate-400 font-bold">AED</span>
+                            </div>
+                        </div>
+
+                        <!-- Delivery Fee Options -->
+                        <div class="pt-2 border-t border-slate-100">
+                            <div class="flex items-center justify-between mb-2">
+                                <label class="text-sm font-semibold text-slate-700 flex items-center gap-2">
+                                    <i class="fa-solid fa-truck-fast text-brand-500"></i>
+                                    رسوم التوصيل
+                                </label>
+                                <label class="relative inline-flex items-center cursor-pointer">
+                                    <input type="checkbox" id="deliveryToggle" checked onchange="toggleDelivery()" class="sr-only peer">
+                                    <div class="w-9 h-5 bg-slate-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:right-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-brand-500"></div>
+                                    <span class="mr-2 text-xs text-slate-600 font-medium" id="deliveryToggleText">تفعيل</span>
+                                </label>
+                            </div>
+                            <div id="deliveryInputContainer" class="relative">
+                                <input type="number" id="deliveryFee" min="0" step="any" placeholder="20" value="20" oninput="calculatePrice()"
+                                    class="w-full pl-12 pr-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-slate-900 font-bold text-base focus:ring-2 focus:ring-brand-500 outline-none transition">
+                                <span class="absolute inset-y-0 left-0 pl-3.5 flex items-center text-xs font-bold text-slate-400">AED</span>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+
+                <!-- Advanced Costs Settings Panel -->
+                <div class="bg-white rounded-2xl p-5 md:p-6 shadow-sm border border-slate-100">
+                    <div class="flex items-center justify-between cursor-pointer select-none" onclick="toggleAdvancedSettings()">
+                        <h2 class="text-base font-bold text-slate-900 flex items-center gap-2">
+                            <i class="fa-solid fa-gear text-slate-500"></i>
+                            إعدادات التكاليف والأرباح
+                        </h2>
+                        <span id="settingsToggleIcon" class="text-slate-400 transition-transform duration-200">
+                            <i class="fa-solid fa-chevron-down"></i>
+                        </span>
+                    </div>
+
+                    <div id="advancedSettings" class="mt-4 pt-4 border-t border-slate-100 space-y-4 hidden">
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                            <!-- Machine Hourly Rate -->
+                            <div>
+                                <label for="hourlyRate" class="block text-xs font-semibold text-slate-600 mb-1">
+                                    سعر تشغيل الماكينة (درهم/ساعة)
+                                </label>
+                                <div class="relative">
+                                    <input type="number" id="hourlyRate" min="0" step="0.5" value="3" oninput="calculatePrice()"
+                                        class="w-full pl-12 pr-3 py-2 bg-slate-50 border border-slate-200 rounded-lg text-sm font-semibold">
+                                    <span class="absolute inset-y-0 left-0 pl-3 flex items-center text-xs text-slate-400">AED</span>
+                                </div>
+                            </div>
+
+                            <!-- Setup & Labor Fee -->
+                            <div>
+                                <label for="laborCost" class="block text-xs font-semibold text-slate-600 mb-1">
+                                    تكلفة التجهيز والعمل اليدوي
+                                </label>
+                                <div class="relative">
+                                    <input type="number" id="laborCost" min="0" step="1" value="10" oninput="calculatePrice()"
+                                        class="w-full pl-12 pr-3 py-2 bg-slate-50 border border-slate-200 rounded-lg text-sm font-semibold">
+                                    <span class="absolute inset-y-0 left-0 pl-3 flex items-center text-xs text-slate-400">AED</span>
+                                </div>
+                            </div>
+
+                            <!-- Profit Margin -->
+                            <div>
+                                <label for="profitMargin" class="block text-xs font-semibold text-slate-600 mb-1">
+                                    هامش الربح (%)
+                                </label>
+                                <div class="relative">
+                                    <input type="number" id="profitMargin" min="0" step="5" value="50" oninput="calculatePrice()"
+                                        class="w-full pl-10 pr-3 py-2 bg-slate-50 border border-slate-200 rounded-lg text-sm font-semibold">
+                                    <span class="absolute inset-y-0 left-0 pl-3 flex items-center text-xs text-slate-400">%</span>
+                                </div>
+                            </div>
+
+                            <!-- Minimum Order Price -->
+                            <div>
+                                <label for="minOrderPrice" class="block text-xs font-semibold text-slate-600 mb-1">
+                                    الحد الأدنى للطلب (بدون توصيل)
+                                </label>
+                                <div class="relative">
+                                    <input type="number" id="minOrderPrice" min="0" step="5" value="25" oninput="calculatePrice()"
+                                        class="w-full pl-12 pr-3 py-2 bg-slate-50 border border-slate-200 rounded-lg text-sm font-semibold">
+                                    <span class="absolute inset-y-0 left-0 pl-3 flex items-center text-xs text-slate-400">AED</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+
+            <!-- Results & Quick Calculator Column (5 cols) -->
+            <div class="lg:col-span-5 space-y-6">
+
+                <!-- Waiting Empty State Card -->
+                <div id="emptyStateCard" class="bg-white rounded-2xl p-8 border border-slate-200 border-dashed text-center flex flex-col items-center justify-center min-h-[260px]">
+                    <div class="w-16 h-16 rounded-full bg-brand-50 text-brand-500 flex items-center justify-center mb-3 text-2xl shadow-inner">
+                        <i class="fa-solid fa-calculator"></i>
+                    </div>
+                    <h3 class="text-base font-bold text-slate-800 mb-1">الموقع جاهز للعمل</h3>
+                    <p class="text-xs text-slate-400 max-w-xs leading-relaxed">اكتب الوزن ووقت الطباعة أعلاه لحساب السعر الإجمالي فوراً</p>
+                </div>
+
+                <!-- Main Price Result Card -->
+                <div id="resultContainer" class="space-y-6 hidden">
+                    <div class="bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 rounded-2xl p-6 text-white shadow-xl relative overflow-hidden">
+                        <div class="absolute -left-10 -bottom-10 w-40 h-40 bg-brand-500/10 rounded-full blur-2xl pointer-events-none"></div>
+
+                        <div class="flex items-center justify-between text-slate-400 text-sm font-medium mb-1">
+                            <span>السعر الإجمالي المطلوب</span>
+                            <span class="bg-brand-500/20 text-brand-400 text-xs px-2.5 py-1 rounded-full font-bold border border-brand-500/30">AED</span>
+                        </div>
+
+                        <!-- Grand Total Price Display -->
+                        <div class="my-3 flex items-baseline gap-2">
+                            <span id="grandTotalPriceDisplay" class="text-5xl font-extrabold tracking-tight text-white">0</span>
+                            <span class="text-xl font-bold text-slate-300">درهم</span>
+                        </div>
+
+                        <!-- Subtotal & Delivery Summary Badge -->
+                        <div class="text-xs text-slate-300 bg-slate-800/80 p-3 rounded-xl border border-slate-700/50 space-y-1">
+                            <div class="flex justify-between">
+                                <span class="text-slate-400">سعر القطعة:</span>
+                                <span class="font-bold text-white"><span id="productPriceDisplay">0</span> درهم</span>
+                            </div>
+                            <div class="flex justify-between" id="deliverySummaryRow">
+                                <span class="text-slate-400">رسوم التوصيل:</span>
+                                <span class="font-bold text-emerald-400">+<span id="deliverySummaryDisplay">20</span> درهم</span>
+                            </div>
+                        </div>
+
+                        <!-- Minimum Price Warning Notice -->
+                        <div id="minPriceNotice" class="hidden mt-3 p-2.5 bg-amber-500/10 border border-amber-500/30 rounded-xl text-amber-300 text-xs flex items-center gap-2">
+                            <i class="fa-solid fa-circle-info text-amber-400 text-sm"></i>
+                            <span>تم تطبيق الحد الأدنى للطلب (<b><span id="minPriceVal">25</span> درهم</b>) للقطعة</span>
+                        </div>
+
+                        <!-- Copy Button -->
+                        <button onclick="copyPrice()" class="mt-4 w-full py-3 px-4 bg-brand-500 hover:bg-brand-600 text-white font-bold rounded-xl shadow-lg shadow-brand-500/25 transition flex items-center justify-center gap-2 text-sm active:scale-95">
+                            <i class="fa-solid fa-copy"></i>
+                            <span id="copyBtnText">نسخ ملخص السعر للعميل</span>
+                        </button>
+                    </div>
+
+                    <!-- Cost Breakdown Details -->
+                    <div class="bg-white rounded-2xl p-5 shadow-sm border border-slate-100 space-y-3">
+                        <h3 class="text-sm font-bold text-slate-900 flex items-center gap-2 border-b border-slate-100 pb-3">
+                            <i class="fa-solid fa-chart-pie text-brand-500"></i>
+                            تفاصيل التكلفة والربح (بدون التوصيل)
+                        </h3>
+
+                        <div class="space-y-2.5 text-xs md:text-sm">
+                            <div class="flex justify-between items-center py-0.5">
+                                <span class="text-slate-600">تكلفة المادة الخام:</span>
+                                <span id="materialCostDisplay" class="font-bold text-slate-800">0.00 درهم</span>
+                            </div>
+
+                            <div class="flex justify-between items-center py-0.5">
+                                <span class="text-slate-600">تشغيل الطابعة والكهرباء:</span>
+                                <span id="machineCostDisplay" class="font-bold text-slate-800">0.00 درهم</span>
+                            </div>
+
+                            <div class="flex justify-between items-center py-0.5">
+                                <span class="text-slate-600">التجهيز والعمل اليدوي:</span>
+                                <span id="laborCostDisplay" class="font-bold text-slate-800">0.00 درهم</span>
+                            </div>
+
+                            <hr class="border-slate-100 my-1">
+
+                            <div class="flex justify-between items-center py-0.5 font-semibold text-slate-700">
+                                <span>إجمالي التكلفة عليك:</span>
+                                <span id="totalCostDisplay" class="font-bold text-slate-900">0.00 درهم</span>
+                            </div>
+
+                            <div class="flex justify-between items-center py-2 px-3 bg-emerald-50 rounded-xl text-emerald-800 font-medium">
+                                <span class="flex items-center gap-1 text-xs">
+                                    <i class="fa-solid fa-coins text-emerald-600"></i>
+                                    صافي الربح المتوقع:
+                                </span>
+                                <span id="profitDisplay" class="font-extrabold text-sm text-emerald-700">0.00 درهم</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Embedded Quick Calculator Component -->
+                <div class="bg-white rounded-2xl p-5 shadow-sm border border-slate-100 space-y-3">
+                    <div class="flex items-center justify-between border-b border-slate-100 pb-3">
+                        <h3 class="text-sm font-bold text-slate-900 flex items-center gap-2">
+                            <i class="fa-solid fa-calculator text-slate-600"></i>
+                            آلة حاسبة سريعة
+                        </h3>
+                        <span class="text-[10px] bg-slate-100 text-slate-500 font-semibold px-2 py-0.5 rounded">جانبية</span>
+                    </div>
+
+                    <!-- Calculator Screen -->
+                    <div class="bg-slate-900 rounded-xl p-3 text-right">
+                        <div id="calcExpr" class="text-xs text-slate-400 h-4 overflow-hidden font-mono"></div>
+                        <div id="calcDisplay" class="text-2xl font-bold text-white font-mono overflow-x-auto tracking-wider">0</div>
+                    </div>
+
+                    <!-- Calculator Grid Buttons -->
+                    <div class="grid grid-cols-4 gap-2 text-sm font-bold">
+                        <button onclick="calcClear()" class="p-2.5 bg-rose-50 text-rose-600 rounded-lg hover:bg-rose-100 transition active:scale-95">C</button>
+                        <button onclick="calcOp('/')" class="p-2.5 bg-slate-100 text-brand-600 rounded-lg hover:bg-slate-200 transition active:scale-95">÷</button>
+                        <button onclick="calcOp('*')" class="p-2.5 bg-slate-100 text-brand-600 rounded-lg hover:bg-slate-200 transition active:scale-95">×</button>
+                        <button onclick="calcOp('-')" class="p-2.5 bg-slate-100 text-brand-600 rounded-lg hover:bg-slate-200 transition active:scale-95">-</button>
+
+                        <button onclick="calcNum('7')" class="p-2.5 bg-slate-50 text-slate-800 rounded-lg hover:bg-slate-100 transition active:scale-95">7</button>
+                        <button onclick="calcNum('8')" class="p-2.5 bg-slate-50 text-slate-800 rounded-lg hover:bg-slate-100 transition active:scale-95">8</button>
+                        <button onclick="calcNum('9')" class="p-2.5 bg-slate-50 text-slate-800 rounded-lg hover:bg-slate-100 transition active:scale-95">9</button>
+                        <button onclick="calcOp('+')" class="p-2.5 bg-slate-100 text-brand-600 rounded-lg hover:bg-slate-200 transition active:scale-95">+</button>
+
+                        <button onclick="calcNum('4')" class="p-2.5 bg-slate-50 text-slate-800 rounded-lg hover:bg-slate-100 transition active:scale-95">4</button>
+                        <button onclick="calcNum('5')" class="p-2.5 bg-slate-50 text-slate-800 rounded-lg hover:bg-slate-100 transition active:scale-95">5</button>
+                        <button onclick="calcNum('6')" class="p-2.5 bg-slate-50 text-slate-800 rounded-lg hover:bg-slate-100 transition active:scale-95">6</button>
+                        <button onclick="calcEquals()" class="p-2.5 bg-brand-500 text-white rounded-lg hover:bg-brand-600 transition row-span-2 flex items-center justify-center active:scale-95 text-lg">=</button>
+
+                        <button onclick="calcNum('1')" class="p-2.5 bg-slate-50 text-slate-800 rounded-lg hover:bg-slate-100 transition active:scale-95">1</button>
+                        <button onclick="calcNum('2')" class="p-2.5 bg-slate-50 text-slate-800 rounded-lg hover:bg-slate-100 transition active:scale-95">2</button>
+                        <button onclick="calcNum('3')" class="p-2.5 bg-slate-50 text-slate-800 rounded-lg hover:bg-slate-100 transition active:scale-95">3</button>
+
+                        <button onclick="calcNum('0')" class="p-2.5 bg-slate-50 text-slate-800 rounded-lg hover:bg-slate-100 transition col-span-2 active:scale-95">0</button>
+                        <button onclick="calcNum('.')" class="p-2.5 bg-slate-50 text-slate-800 rounded-lg hover:bg-slate-100 transition active:scale-95">.</button>
+                    </div>
+                </div>
+
+            </div>
+
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-white border-t border-slate-200 mt-10 py-4 text-center text-xs text-slate-500">
+        <p>حاسبة أسعار الطباعة ثلاثية الأبعاد &copy; تصميم بسيط وسريع</p>
+    </footer>
+
+    <script>
+        // Advanced settings drawer toggle
+        function toggleAdvancedSettings() {
+            const settingsDiv = document.getElementById('advancedSettings');
+            const toggleIcon = document.getElementById('settingsToggleIcon');
+            
+            if (settingsDiv.classList.contains('hidden')) {
+                settingsDiv.classList.remove('hidden');
+                toggleIcon.classList.add('rotate-180');
+            } else {
+                settingsDiv.classList.add('hidden');
+                toggleIcon.classList.remove('rotate-180');
+            }
+        }
+
+        // Material select logic
+        function handleMaterialChange() {
+            const materialSelect = document.getElementById('materialType');
+            const customContainer = document.getElementById('customSpoolContainer');
+            const spoolInput = document.getElementById('spoolPrice');
+
+            if (materialSelect.value === 'custom') {
+                customContainer.classList.remove('hidden');
+            } else {
+                customContainer.classList.add('hidden');
+                spoolInput.value = materialSelect.value;
+            }
+            calculatePrice();
+        }
+
+        // Delivery toggle logic
+        function toggleDelivery() {
+            const toggle = document.getElementById('deliveryToggle');
+            const toggleText = document.getElementById('deliveryToggleText');
+            const deliveryInputContainer = document.getElementById('deliveryInputContainer');
+
+            if (toggle.checked) {
+                toggleText.innerText = 'تفعيل';
+                deliveryInputContainer.classList.remove('opacity-40', 'pointer-events-none');
+            } else {
+                toggleText.innerText = 'إلغاء';
+                deliveryInputContainer.classList.add('opacity-40', 'pointer-events-none');
+            }
+            calculatePrice();
+        }
+
+        // Core Calculation Algorithm
+        function calculatePrice() {
+            const weightVal = document.getElementById('weight').value;
+            const hoursVal = document.getElementById('hours').value;
+            const minutesVal = document.getElementById('minutes').value;
+
+            const emptyStateCard = document.getElementById('emptyStateCard');
+            const resultContainer = document.getElementById('resultContainer');
+
+            // Hide calculations if inputs are empty
+            if (weightVal.trim() === '' && hoursVal.trim() === '' && minutesVal.trim() === '') {
+                emptyStateCard.classList.remove('hidden');
+                resultContainer.classList.add('hidden');
+                return;
+            }
+
+            emptyStateCard.classList.add('hidden');
+            resultContainer.classList.remove('hidden');
+
+            const weight = parseFloat(weightVal) || 0;
+            const hours = parseFloat(hoursVal) || 0;
+            const minutes = parseFloat(minutesVal) || 0;
+
+            const materialSelect = document.getElementById('materialType');
+            let spoolPrice = 80;
+            if (materialSelect.value === 'custom') {
+                spoolPrice = parseFloat(document.getElementById('spoolPrice').value) || 80;
+            } else {
+                spoolPrice = parseFloat(materialSelect.value) || 80;
+            }
+
+            const hourlyRate = parseFloat(document.getElementById('hourlyRate').value) || 0;
+            const laborCost = parseFloat(document.getElementById('laborCost').value) || 0;
+            const profitMargin = parseFloat(document.getElementById('profitMargin').value) || 0;
+            const minOrderPrice = parseFloat(document.getElementById('minOrderPrice').value) || 0;
+
+            // Delivery Fee
+            const isDeliveryActive = document.getElementById('deliveryToggle').checked;
+            const deliveryFee = isDeliveryActive ? (parseFloat(document.getElementById('deliveryFee').value) || 0) : 0;
+
+            // 1. Material Cost Calculation
+            const costPerGram = spoolPrice / 1000;
+            const materialCost = weight * costPerGram;
+
+            // 2. Machine Operating Cost
+            const totalHours = hours + (minutes / 60);
+            const machineCost = totalHours * hourlyRate;
+
+            // 3. Base Costs
+            const totalCost = materialCost + machineCost + laborCost;
+
+            // 4. Product Price with Margin
+            let calculatedProductPrice = totalCost * (1 + (profitMargin / 100));
+
+            const minNotice = document.getElementById('minPriceNotice');
+            document.getElementById('minPriceVal').innerText = minOrderPrice;
+
+            let finalProductPrice = calculatedProductPrice;
+            if (calculatedProductPrice < minOrderPrice && (weight > 0 || totalHours > 0)) {
+                finalProductPrice = minOrderPrice;
+                minNotice.classList.remove('hidden');
+            } else {
+                minNotice.classList.add('hidden');
+            }
+
+            const grandTotal = finalProductPrice + deliveryFee;
+            const profitAmount = finalProductPrice - totalCost;
+
+            // UI Render Updates
+            document.getElementById('productPriceDisplay').innerText = Math.round(finalProductPrice);
+            document.getElementById('grandTotalPriceDisplay').innerText = Math.max(0, Math.round(grandTotal));
+
+            const deliverySummaryRow = document.getElementById('deliverySummaryRow');
+            if (isDeliveryActive && deliveryFee > 0) {
+                deliverySummaryRow.classList.remove('hidden');
+                document.getElementById('deliverySummaryDisplay').innerText = deliveryFee;
+            } else {
+                deliverySummaryRow.classList.add('hidden');
+            }
+
+            document.getElementById('materialCostDisplay').innerText = materialCost.toFixed(2) + ' درهم';
+            document.getElementById('machineCostDisplay').innerText = machineCost.toFixed(2) + ' درهم';
+            document.getElementById('laborCostDisplay').innerText = laborCost.toFixed(2) + ' درهم';
+            document.getElementById('totalCostDisplay').innerText = totalCost.toFixed(2) + ' درهم';
+            document.getElementById('profitDisplay').innerText = Math.max(0, profitAmount).toFixed(2) + ' درهم';
+        }
+
+        // Copy quote summary text
+        function copyPrice() {
+            const grandTotal = document.getElementById('grandTotalPriceDisplay').innerText;
+            const productPrice = document.getElementById('productPriceDisplay').innerText;
+            const weight = document.getElementById('weight').value || 0;
+            const hours = document.getElementById('hours').value || 0;
+            const minutes = document.getElementById('minutes').value || 0;
+            const isDeliveryActive = document.getElementById('deliveryToggle').checked;
+            const deliveryFee = isDeliveryActive ? (document.getElementById('deliveryFee').value || 0) : 0;
+
+            let deliveryText = isDeliveryActive ? `\n- رسوم التوصيل: ${deliveryFee} درهم` : '';
+
+            const textToCopy = `عرض سعر طباعة 3D:\n- الوزن: ${weight} جرام\n- الوقت: ${hours} ساعة و ${minutes} دقيقة\n- سعر المنتج: ${productPrice} درهم${deliveryText}\n- الإجمالي: ${grandTotal} درهم إماراتي`;
+
+            const tempInput = document.createElement('textarea');
+            tempInput.value = textToCopy;
+            document.body.appendChild(tempInput);
+            tempInput.select();
+            document.execCommand('copy');
+            document.body.removeChild(tempInput);
+
+            const copyBtnText = document.getElementById('copyBtnText');
+            const originalText = copyBtnText.innerText;
+            copyBtnText.innerText = 'تم النسخ بنجاح! ✓';
+            setTimeout(() => {
+                copyBtnText.innerText = originalText;
+            }, 2000);
+        }
+
+        // Reset all inputs to blank defaults
+        function resetCalculator() {
+            document.getElementById('weight').value = '';
+            document.getElementById('hours').value = '';
+            document.getElementById('minutes').value = '';
+            
+            document.getElementById('materialType').value = '80';
+            document.getElementById('spoolPrice').value = '80';
+            document.getElementById('deliveryFee').value = '20';
+            document.getElementById('deliveryToggle').checked = true;
+            
+            document.getElementById('hourlyRate').value = '3';
+            document.getElementById('laborCost').value = '10';
+            document.getElementById('profitMargin').value = '50';
+            document.getElementById('minOrderPrice').value = '25';
+            
+            toggleDelivery();
+            handleMaterialChange();
+            calculatePrice();
+        }
+
+        // --- Quick Embedded Calculator Logic ---
+        let calcVal = '0';
+        let calcExpression = '';
+        let calcResetNext = false;
+
+        function updateCalcDisplay() {
+            document.getElementById('calcDisplay').innerText = calcVal;
+            document.getElementById('calcExpr').innerText = calcExpression;
+        }
+
+        function calcNum(num) {
+            if (calcVal === '0' || calcResetNext) {
+                calcVal = num;
+                calcResetNext = false;
+            } else {
+                calcVal += num;
+            }
+            updateCalcDisplay();
+        }
+
+        function calcOp(op) {
+            calcExpression = calcVal + ' ' + op + ' ';
+            calcResetNext = true;
+            updateCalcDisplay();
+        }
+
+        function calcClear() {
+            calcVal = '0';
+            calcExpression = '';
+            calcResetNext = false;
+            updateCalcDisplay();
+        }
+
+        function calcEquals() {
+            if (!calcExpression) return;
+            try {
+                const fullExpr = calcExpression + calcVal;
+                // Safe parsing of arithmetic operators
+                const sanitizedExpr = fullExpr.replace(/×/g, '*').replace(/÷/g, '/');
+                const result = eval(sanitizedExpr);
+                calcExpression = fullExpr + ' =';
+                calcVal = String(Number.isInteger(result) ? result : parseFloat(result.toFixed(4)));
+                calcResetNext = true;
+            } catch (e) {
+                calcVal = 'خطأ';
+                calcResetNext = true;
+            }
+            updateCalcDisplay();
+        }
+
+        window.onload = function() {
+            resetCalculator();
+        };
+    </script>
+</body>
+</html>
